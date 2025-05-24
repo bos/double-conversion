@@ -36,7 +36,7 @@ convert :: (RealFloat a, RealFloat b, b ~ ForeignFloating a) => String -> CInt
 {-# SPECIALIZE convert :: String -> CInt -> (forall s. CDouble -> MutableByteArray# s -> IO CInt) -> Double -> Builder #-}
 {-# SPECIALIZE convert :: String -> CInt -> (forall s. CFloat -> MutableByteArray# s -> IO CInt) -> Float -> Builder #-}
 {-# INLINABLE convert #-}
-convert func len act val = runST $ do 
+convert func len act val = runST $ do
 #if MIN_VERSION_text(2,0,0)
   mTempArr@(A.MutableByteArray tempMArr) <- A.new (fromIntegral len)
 #else
@@ -48,7 +48,7 @@ convert func len act val = runST $ do
       error $ "Data.Double.Conversion.Text." ++ func ++
               ": conversion failed."
 #if MIN_VERSION_text(2,0,0)
-  return $ writeN (fromIntegral size) $ \mArr _ -> A.copyI (fromIntegral size) mArr 0 tempArr 0
+  return $ writeN (fromIntegral size) $ \mArr offset -> A.copyI (fromIntegral size) mArr offset tempArr 0
 #else
-  return $ writeN (fromIntegral size) $ \mArr _ -> A.copyI mArr 0 tempArr 0 (fromIntegral size)
+  return $ writeN (fromIntegral size) $ \mArr offset -> A.copyI mArr offset tempArr 0 (fromIntegral size)
 #endif
